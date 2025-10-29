@@ -1,4 +1,20 @@
 @extends('layouts.app')
+
+@section('toastr')
+    @if(session('success'))
+        <script>toastr.success("{{ session('success') }}");</script>
+    @endif
+    @if(session('error'))
+        <script>toastr.error("{{ session('error') }}");</script>
+    @endif
+    @if(session('warning'))
+        <script>toastr.warning("{{ session('warning') }}");</script>
+    @endif
+    @if(session('info'))
+        <script>toastr.info("{{ session('info') }}");</script>
+    @endif
+@endsection
+
 @section('content')
 <div class="container py-4">
     <div class="card shadow-sm">
@@ -12,10 +28,10 @@
                         <i class="fas fa-plus"></i> Add Users
                     </a>
                     <div class="btn-group ms-2">
-                        <a href="{{ route('admins.export.csv') }}" class="btn btn-success">
+                        <a href="{{ route('admins.export.csv') }}" class="btn btn-success export-btn" data-filename="users.csv">
                             <i class="fas fa-file-csv"></i> CSV
                         </a>
-                        <a href="{{ route('admins.export.pdf') }}" class="btn btn-danger">
+                        <a href="{{ route('admins.export.pdf') }}" class="btn btn-danger export-btn" data-filename="users.pdf">
                             <i class="fas fa-file-pdf"></i> PDF
                         </a>
                     </div>
@@ -25,12 +41,22 @@
         
         <div class="card-body">
             <form method="GET" class="row g-3 mb-4">
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <div class="input-group">
                         <input type="text" class="form-control" name="search" value="{{ $search }}" placeholder="Search by name or email...">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-search"></i> Search
                         </button>
+                    </div>
+                </div>
+                <div class="col-md-2 ms-auto">
+                    <div class="input-group">
+                        <label class="input-group-text" for="per_page">Per page</label>
+                        <select id="per_page" name="per_page" class="form-select" onchange="this.form.submit()">
+                            @foreach([5,10,25,50,100] as $pp)
+                                <option value="{{ $pp }}" {{ request('per_page', 5) == $pp ? 'selected' : '' }}>{{ $pp }}</option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
             </form>
@@ -122,10 +148,56 @@
             </div>
 
             <div class="d-flex justify-content-center mt-4">
-                {{ $admins->appends(['search' => $search, 'sort' => $sort])->links() }}
+                {{ $admins->appends(['search' => $search, 'sort' => $sort, 'per_page' => request('per_page', 5)])->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>
 </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const exportButtons = document.querySelectorAll('.export-btn');
+
+    exportButtons.forEach(btn => {
+        btn.addEventListener('click', async function (e) {
+            e.preventDefault();
+            const url = this.getAttribute('href');
+            const fallbackName = this.dataset.filename || 'download';
+ 
+            toastr.info('Preparing your download...');
+
+            try {
+                const response = await fetch(url, { method: 'GET', credentials: 'same-origin' });
+                if (!response.ok) throw new Error('Network response was not ok');
+
+                const blob = await response.blob();
+ 
+                let filename = fallbackName;
+                const cd = response.headers.get('content-disposition');
+                if (cd) {
+                    const match = cd.match(/filename\*=UTF-8''([^;\n]+)/) || cd.match(/filename="?([^";\n]+)"?/);
+                    if (match) filename = decodeURIComponent(match[1]);
+                }
+
+                const blobUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(blobUrl);
+
+                toastr.success('Download started');
+            } catch (err) {
+                console.error(err);
+                toastr.error('Failed to download file');
+            }
+        });
+    });
+});
+</script>
+@endpush
