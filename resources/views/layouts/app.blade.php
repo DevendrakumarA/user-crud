@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,52 +11,66 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
     <style>
         body {
             background-color: #f8f9fa;
         }
+
         .img-thumbnail {
             object-fit: cover;
             border-radius: 50%;
             border: 2px solid #dee2e6;
             padding: 2px;
         }
+
         .table td {
             vertical-align: middle;
         }
+
         .btn-group {
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
+
         .card {
             border: none;
             border-radius: 10px;
         }
+
         .card-header {
-            border-bottom: 1px solid rgba(0,0,0,.125);
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
         }
+
         .table thead th {
             font-weight: 600;
             text-transform: uppercase;
             font-size: 0.85rem;
             letter-spacing: 0.5px;
         }
+
         .pagination {
             margin-bottom: 0;
         }
+
         .btn {
             font-weight: 500;
         }
+
         .text-muted {
             font-size: 0.9rem;
         }
+
         .navbar {
-            box-shadow: 0 2px 4px rgba(0,0,0,.08);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
         }
+
         .table-hover tbody tr:hover {
-            background-color: rgba(0,0,0,.01);
+            background-color: rgba(0, 0, 0, .01);
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
         <div class="container">
@@ -63,25 +78,21 @@
         </div>
     </nav>
 
-    @if(session('success'))
-        <div class="container">
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+
+    {{-- Validation errors (for create/edit) --}}
+    @if($errors->any())
+    <div class="container">
+        <div class="alert alert-danger">
+            <ul>
+                @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
+    </div>
     @endif
 
-    @if($errors->any())
-        <div class="container">
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-    @endif
+    {{-- Toastr section for session messages (moved to after JS includes) --}}
 
     @yield('content')
 
@@ -89,5 +100,17 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Lightbox JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+    <!-- jQuery (required by toastr) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    {{-- Render page-specific toastr scripts --}}
+    @yield('toastr')
+
+    @stack('scripts')
+
 </body>
+
 </html>
