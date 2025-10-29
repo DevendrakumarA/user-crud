@@ -147,7 +147,8 @@
     </table>
             </div>
 
-            <div class="d-flex justify-content-center mt-4">
+<<<<<<< HEAD
+            <div class="d-flex justify-content-center mt-4 mx-1">
                 {{ $admins->appends(['search' => $search, 'sort' => $sort, 'per_page' => request('per_page', 5)])->links('pagination::bootstrap-5') }}
             </div>
         </div>
@@ -166,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const url = this.getAttribute('href');
             const fallbackName = this.dataset.filename || 'download';
- 
+            // Show immediate toastr
             toastr.info('Preparing your download...');
 
             try {
@@ -174,7 +175,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!response.ok) throw new Error('Network response was not ok');
 
                 const blob = await response.blob();
- 
+
+                // Try to get filename from Content-Disposition header
                 let filename = fallbackName;
                 const cd = response.headers.get('content-disposition');
                 if (cd) {
