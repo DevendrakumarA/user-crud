@@ -147,6 +147,7 @@
     </table>
             </div>
 
+<<<<<<< HEAD
             <div class="d-flex justify-content-center mt-4 mx-1">
                 {{ $admins->appends(['search' => $search, 'sort' => $sort, 'per_page' => request('per_page', 5)])->links('pagination::bootstrap-5') }}
             </div>
@@ -166,7 +167,6 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const url = this.getAttribute('href');
             const fallbackName = this.dataset.filename || 'download';
-
             // Show immediate toastr
             toastr.info('Preparing your download...');
 
