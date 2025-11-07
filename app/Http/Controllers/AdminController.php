@@ -6,21 +6,21 @@ use App\Models\Admin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
- 
+
 class AdminController extends Controller
 {
     public function index(Request $request)
     {
         $search = $request->query('search');
         $sort = $request->query('sort', 'id');
-         $allowedSorts = ['id', 'name', 'email', 'phone', 'created_at'];
+        $allowedSorts = ['id', 'name', 'email', 'phone', 'created_at'];
         if (!in_array($sort, $allowedSorts)) {
             $sort = 'id';
         }
 
-         $perPage = (int) $request->query('per_page', 5);
+        $perPage = (int) $request->query('per_page', 5);
         if ($perPage <= 0) $perPage = 5;
-        $perPage = min($perPage, 100);  
+        $perPage = min($perPage, 100);
 
         $admins = Admin::when($search, function ($query, $search) {
             return $query->where('name', 'like', "%$search%")
@@ -134,7 +134,7 @@ class AdminController extends Controller
             foreach ($users as $user) {
                 $profileUrl = $user->profile ? asset('storage/' . $user->profile) : '';
                 $resumeUrl = $user->resume ? asset('storage/' . $user->resume) : '';
-                
+
                 fputcsv($handle, [
                     $user->id,
                     $user->name,
