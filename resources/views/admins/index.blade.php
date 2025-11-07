@@ -147,8 +147,7 @@
     </table>
             </div>
 
-<<<<<<< HEAD
-            <div class="d-flex justify-content-center mt-4 mx-1">
+             <div class="d-flex justify-content-center mt-4 mx-1">
                 {{ $admins->appends(['search' => $search, 'sort' => $sort, 'per_page' => request('per_page', 5)])->links('pagination::bootstrap-5') }}
             </div>
         </div>
